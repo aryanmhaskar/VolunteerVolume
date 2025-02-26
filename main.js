@@ -2,19 +2,28 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase} from "firebase/database";
+import { apiKey } from "./secret.js";
+import { authDomain } from "./secret.js";
+import { projectId } from "./secret.js";
+import { storageBucket } from "./secret.js";
+import { messagingSenderId } from "./secret.js";
+import { appId } from "./secret.js";
+import { measurementId } from "./secret.js";
+import { databaseURL } from "./secret.js";
+
 // TODO: Add SDKs for Firebase products that we want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Our web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCgkYCq7PFOcarUEtjaYVrf3QcZkLlZEEk",
-  authDomain: "volunteervolume-91e20.firebaseapp.com",
-  projectId: "volunteervolume-91e20",
-  storageBucket: "volunteervolume-91e20.firebasestorage.app",
-  messagingSenderId: "1020304409073",
-  appId: "1:1020304409073:web:81fe0ae39bc5effc130450",
-  measurementId: "G-P3JWNGQ1TE",
-  databaseURL: "https://volunteervolume-91e20-default-rtdb.firebaseio.com/"
+  apiKey: apiKey,
+  authDomain: authDomain,
+  projectId: projectId,
+  storageBucket: storageBucket,
+  messagingSenderId: messagingSenderId,
+  appId: appId,
+  measurementId: measurementId,
+  databaseURL: databaseURL
 };
 
 // Initialize Firebase
