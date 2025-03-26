@@ -14,15 +14,111 @@
 			<img src="./assets/logo.png" alt="Logo">
 			<form id="volunteerForm" class="login">
 				<h1>Register</h1>
-				<input type="text" id="firstname" name="firstname" placeholder="First Name" required>
-				<input type="text" id="lastname" name="lastname" placeholder="Last Name" required>
-				<input type="email" id="email" name="email" placeholder="Email Address" required>
-				<h3>Birthday (MM/DD/YYYY)<h3>
+				<h2>Personal Information</h2>
+				<input type="text" id="firstname" name="firstname" placeholder="First and Last Name" required>
+				<input type="number" id="lastname" name="lastname" placeholder="Phone Number" required>
+				<input type="text" id="email" name="email" placeholder="Email Address" required>
+				<h3>Birthday</h3>
 				<div class="birthday">
-					<input type="text" id="month" name="month" placeholder="MM" maxlength="2" required>
-					<input type="text" id="day" name="day" placeholder="DD" maxlength="2" required>
-					<input type="text" id="year" name="year" placeholder="YYYY" maxlength="4" required>
+					<input type="number" id="month" name="month" placeholder="MM" required>
+					<input type="number" id="day" name="day" placeholder="DD" required>
+					<input type="number" id="year" name="year" placeholder="YYYY" required>
 				</div>
+				<input type="text" id="address" name="address" placeholder= "Address" required>
+				<input type="text" id="city" name="city" placeholder= "City" required>
+				<input type="text" id="state" name="state" placeholder= "State" required>
+				<input type="number" id="zipcode" name="zipcode" placeholder= "Zip Code" required>
+
+				<h3>Check One *</h3>
+				<select id="status" name="status" required>
+					<option value="" disabled selected>Select an Option</option>
+					<option value="middle_school">Middle School Student</option>
+					<option value="high_school">High School Student</option>
+					<option value="college">College Student</option>
+					<option value="employed">Employed</option>
+					<option value="retired">Retired</option>
+				</select>
+
+				<h3 for="yes-no"> Have you been vaccinated against COVID-19?</h3>
+				<select id="yes-no" name="yes-no" required>
+					<option value="" disabled selected>Select</option>
+					<option value="yes">Yes</option>
+					<option value="no">No</option>
+				</select>		
+
+				<h3 for="yes-no"> Have you ever been convicted of or pled guilty to any criminal offense other than a minor traffic violation?</h3>
+				<select id="yes-no" name="yes-no" required>
+					<option value="" disabled selected>Select</option>
+					<option value="yes">Yes</option>
+					<option value="no">No</option>
+				</select>			
+				<input type="text" id="explain" name="explain" placeholder= "If so, please explain">
+
+				<h3>How did you hear about volunteer opportunities at VDM?</h3>
+				<select id="source" name="source" required onchange="toggleOtherInput()">
+					<option value="" disabled selected>Select an Option</option>
+					<option value="volunteer">Current or Former Volunteer</option>
+					<option value="community">Community Posting</option>
+					<option value="united_way">United Way</option>
+					<option value="uva">UVA Public Service</option>
+					<option value="website">VDM Website</option>
+					<option value="flyer">VDM Flyer</option>
+					<option value="other">Other</option> <!-- make sure value is exactly "other" -->
+				</select>
+				
+				<!-- hidden text input for "Other" -->
+				<input type="text" id="other-input" name="other-source" placeholder="Please specify" style="display: none; margin-top: 10px;">
+				
+				<script>
+				function toggleOtherInput() {
+					var sourceDropdown = document.getElementById("source"); // Reference correct dropdown
+					var otherInput = document.getElementById("other-input");
+				
+					if (sourceDropdown.value === "other") {
+						otherInput.style.display = "block";
+						otherInput.required = true;
+					} else {
+						otherInput.style.display = "none";
+						otherInput.required = false;
+						otherInput.value = ""; // Clear input when hidden
+					}
+				}
+				</script>
+				
+				<h2>Experience & Interests</h2>
+				<input type="text" id="volexperience" name="volexperience" placeholder= "Volunter Experience" required>			
+				<input type="text" id="empexperience" name="empexperience" placeholder= "Employment Experience" required>	
+				<input type="text" id="reference" name="reference" placeholder= "Reference (Name, Email or Phone Number, and Relationship)" required>
+				<input type="text" id="hobbies" name="hobbies" placeholder= "Interests & Hobbies" required>
+				<input type="text" id="why" name="why" placeholder= "Why are you interested in volunteering at the Museum?" required>
+
+				<h2>Availability</h2>
+				<h3>Which volunteer position interests you? *</h3>
+				<div>
+					<label><input type="checkbox" name="volunteer-position[]" value="front_desk"> Front Desk Volunteer</label><br>
+					<label><input type="checkbox" name="volunteer-position[]" value="gallery"> Gallery Volunteer</label>
+				</div>
+				
+				<h3>What is your volunteer availability? *</h3>
+				<div>
+					<label><input type="checkbox" name="availability[]" value="weekday"> Regular shift(s) during the week</label><br>
+					<label><input type="checkbox" name="availability[]" value="weekend"> Regular weekend shift(s)</label><br>
+					<label><input type="checkbox" name="availability[]" value="occasional"> Occasional shifts</label><br>
+					<label><input type="checkbox" name="availability[]" value="need_based"> On a need basis</label>
+				</div>
+				
+				<h3>What day(s) are best for you? *</h3>
+				<div>
+					<label><input type="checkbox" name="days[]" value="monday"> Monday</label><br>
+					<label><input type="checkbox" name="days[]" value="tuesday"> Tuesday</label><br>
+					<label><input type="checkbox" name="days[]" value="wednesday"> Wednesday</label><br>
+					<label><input type="checkbox" name="days[]" value="thursday"> Thursday</label><br>
+					<label><input type="checkbox" name="days[]" value="friday"> Friday</label><br>
+					<label><input type="checkbox" name="days[]" value="saturday"> Saturday</label><br>
+					<label><input type="checkbox" name="days[]" value="sunday"> Sunday</label>
+				</div>
+				
+				
 				<button type="submit">Submit</button>
 			</form>
 		</div>
