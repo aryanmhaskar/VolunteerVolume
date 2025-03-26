@@ -11,12 +11,18 @@
 	</head>
 	<body>
 		<div class="content">
-			<img src="../assets/logo.png" alt="Logo">
+			<img src="./assets/logo.png" alt="Logo">
 			<form id="volunteerForm" class="login">
 				<h1>Register</h1>
 				<input type="text" id="firstname" name="firstname" placeholder="First Name" required>
 				<input type="text" id="lastname" name="lastname" placeholder="Last Name" required>
 				<input type="email" id="email" name="email" placeholder="Email Address" required>
+				<h3>Birthday (MM/DD/YYYY)<h3>
+				<div class="birthday">
+					<input type="text" id="month" name="month" placeholder="MM" maxlength="2" required>
+					<input type="text" id="day" name="day" placeholder="DD" maxlength="2" required>
+					<input type="text" id="year" name="year" placeholder="YYYY" maxlength="4" required>
+				</div>
 				<button type="submit">Submit</button>
 			</form>
 		</div>
