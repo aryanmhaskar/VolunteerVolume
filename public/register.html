@@ -15,8 +15,9 @@
 			<form id="volunteerForm" class="login">
 				<h1>Register</h1>
 				<h2>Personal Information</h2>
-				<input type="text" id="firstname" name="firstname" placeholder="First and Last Name" required>
-				<input type="number" id="lastname" name="lastname" placeholder="Phone Number" required>
+				<input type="text" id="firstname" name="firstname" placeholder="First Name" required>
+				<input type="text" id="lastname" name="lastname" placeholder="Last Name" required>
+				<input type="tel" id="phone" name="phone" placeholder="Phone Number" required>
 				<input type="text" id="email" name="email" placeholder="Email Address" required>
 				<h3>Birthday</h3>
 				<div class="birthday">
@@ -40,14 +41,14 @@
 				</select>
 
 				<h3 for="yes-no"> Have you been vaccinated against COVID-19?</h3>
-				<select id="yes-no" name="yes-no" required>
+				<select id="vaccinated-status" name="yes-no" required>
 					<option value="" disabled selected>Select</option>
 					<option value="yes">Yes</option>
 					<option value="no">No</option>
-				</select>		
+				</select> 		
 
 				<h3 for="yes-no"> Have you ever been convicted of or pled guilty to any criminal offense other than a minor traffic violation?</h3>
-				<select id="yes-no" name="yes-no" required>
+				<select id="criminal-record" name="yes-no" required>
 					<option value="" disabled selected>Select</option>
 					<option value="yes">Yes</option>
 					<option value="no">No</option>
@@ -119,12 +120,114 @@
 				</div>
 				
 				
-				<button type="submit">Submit</button>
+				<button id="submit" type="submit">Submit</button>
 			</form>
 		</div>
-		<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"></script>
-		<script src="../scripts/main.js"></script>
-		<script src="../scripts/database_test.js"></script>
+		<script type="module">
+			import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+			import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+			
+			// Firebase configuration
+			const firebaseConfig = {
+				apiKey: "AIzaSyCgkYCq7PFOcarUEtjaYVrf3QcZkLlZEEk",
+				authDomain: "volunteervolume-91e20.firebaseapp.com",
+				projectId: "volunteervolume-91e20",
+				storageBucket: "volunteervolume-91e20.firebasestorage.app",
+				messagingSenderId: "1020304409073",
+				appId: "1:1020304409073:web:81fe0ae39bc5effc130450",
+				measurementId: "G-P3JWNGQ1TE",
+				databaseURL: "https://volunteervolume-91e20-default-rtdb.firebaseio.com/"
+			};
+			
+			// Initialize Firebase
+			const app = initializeApp(firebaseConfig);
+			const db = getDatabase(app);
+			
+			document.getElementById("volunteerForm").addEventListener("submit", function (e) {
+				e.preventDefault();
+			
+				// Get values from the form
+				const firstname = document.getElementById("firstname").value.trim();
+				const lastname = document.getElementById("lastname").value.trim();
+				const email = document.getElementById("email").value.trim();
+				const phone = document.getElementById("phone").value.trim();
+				const birthdate = {
+					month: document.getElementById("month").value.trim(),
+					day: document.getElementById("day").value.trim(),
+					year: document.getElementById("year").value.trim()
+				};
+				const address = document.getElementById("address").value.trim();
+				const city = document.getElementById("city").value.trim();
+				const state = document.getElementById("state").value.trim();
+				const zipcode = document.getElementById("zipcode").value.trim();
+				const status = document.getElementById("status").value;
+				const vaccinated = document.getElementById("vaccinated-status").value;
+				const criminalRecord = document.getElementById("criminal-record").value;
+				const explainRecord = document.getElementById("explain").value.trim();
+				const source = document.getElementById("source").value;
+				const otherSource = document.getElementById("other-input").value.trim();
+				const volExperience = document.getElementById("volexperience").value.trim();
+				const empExperience = document.getElementById("empexperience").value.trim();
+				const reference = document.getElementById("reference").value.trim();
+				const hobbies = document.getElementById("hobbies").value.trim();
+				const whyVolunteer = document.getElementById("why").value.trim();
+				
+				// Get checkbox values
+				const positions = Array.from(document.querySelectorAll("input[name='volunteer-position[]']:checked"))
+					.map(input => input.value);
+				const availability = Array.from(document.querySelectorAll("input[name='availability[]']:checked"))
+					.map(input => input.value);
+				const days = Array.from(document.querySelectorAll("input[name='days[]']:checked"))
+					.map(input => input.value);
+				
+				if (!firstname || !lastname || !email) {
+					alert("Please fill out all required fields.");
+					return;
+				}
+			
+				const usersRef = ref(db, 'Volunteers/' + firstname + "_" + lastname);
+			
+				get(usersRef).then((snapshot) => {
+					if (snapshot.exists()) {
+						alert("This email is already registered! Please log in instead.");
+						window.location.href = "index.html";
+					} else {
+						set(usersRef, {
+							firstname,
+							lastname,
+							email,
+							phone,
+							birthdate,
+							address,
+							city,
+							state,
+							zipcode,
+							status,
+							vaccinated,
+							criminalRecord,
+							explainRecord,
+							source: source === "other" ? otherSource : source,
+							volExperience,
+							empExperience,
+							reference,
+							hobbies,
+							whyVolunteer,
+							positions,
+							availability,
+							days
+						}).then(() => {
+							alert("Account created successfully!");
+							window.location.href = "testRedirect.html";
+						}).catch((error) => {
+							console.error("Error saving data: ", error);
+							alert("Error signing up. Please try again.");
+						});
+					}
+				}).catch((error) => {
+					console.error("Error checking database: ", error);
+					alert("Database error. Please try again later.");
+				});
+			});
+			</script>
 	</body>
 </html>
