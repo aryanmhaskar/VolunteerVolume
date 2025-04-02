@@ -48,11 +48,7 @@ h3 {
 
 h4 {
 	font-weight: 700;
-	margin-bottom: 1rem;
-}
-
-h5 {
-	margin-bottom: 1rem;
+	margin-bottom: 0.5rem;
 }
 
 a {
@@ -63,8 +59,8 @@ a {
 	display: flex;
 	flex-direction: column;
 	align-items: start;
-	margin: 0;
-	padding: 5%;
+	padding: 0 15%;
+	margin: 5%;
 }
 
 .content img {
@@ -77,7 +73,7 @@ a {
 	align-items: center;
 	max-width: 50%;
 	gap: 1rem;
-	marign: 0;
+	margin: 0;
 }
 
 input {
@@ -112,9 +108,12 @@ button:hover {
 	background: var(--purple-2);
 }
 
+/* Main content */
+
 .row {
 	display: flex;
 	width: 100%;
+	gap: 1rem;
 }
 
 .shifts {
@@ -124,9 +123,11 @@ button:hover {
 
 .stats {
 	width: 300px;
-	padding: 1rem;
 	box-sizing: border-box;
 }
+
+
+/* Shift Object */
 
 .shift {
 	width: 100%;
@@ -137,13 +138,23 @@ button:hover {
 	border-radius: 6px;
 }
 
-.shift > h4 {
-	margin: 0;
+.shift-header {
+	display: flex;
+	flex-direction: row;
+	align-items: space-between;
+	justify-content: space-between;
+	width: 100%;
 }
+
+.shift h4,
+.shift h5 { margin: 0; }
+.shift p { margin: 1rem 0 0 0; }
+
+/* Calendar */
 
 .calendar {
 	display: flex;
-	justify-content: center; /* Horizontal centering */
-	align-items: center;     /* Vertical centering (optional) */
-	height: 100vh;           /* Optional: make it fill the full viewport height */
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
 }
