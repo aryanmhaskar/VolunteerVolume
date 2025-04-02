@@ -29,7 +29,7 @@ body {
 	min-height: 100vh;
 }
 
-h1, h2, h3 { margin: 0; }
+h1, h2, h3, h4, h5 { margin: 0; }
 
 h1 {
 	font-size: 30px;
@@ -43,6 +43,16 @@ h3 {
 	font-weight: 700;
 	text-transform: uppercase;
 	color: var(--green);
+	margin-bottom: 1rem;
+}
+
+h4 {
+	font-weight: 700;
+	margin-bottom: 1rem;
+}
+
+h5 {
+	margin-bottom: 1rem;
 }
 
 a {
@@ -100,4 +110,40 @@ button {
 
 button:hover {
 	background: var(--purple-2);
+}
+
+.row {
+	display: flex;
+	width: 100%;
+}
+
+.shifts {
+	flex: 1;
+	box-sizing: border-box;
+}
+
+.stats {
+	width: 300px;
+	padding: 1rem;
+	box-sizing: border-box;
+}
+
+.shift {
+	width: 100%;
+	padding: 1rem;
+	box-sizing: border-box;
+	border: 1px solid var(--light-gray);
+	margin-bottom: 1rem;
+	border-radius: 6px;
+}
+
+.shift > h4 {
+	margin: 0;
+}
+
+.calendar {
+	display: flex;
+	justify-content: center; /* Horizontal centering */
+	align-items: center;     /* Vertical centering (optional) */
+	height: 100vh;           /* Optional: make it fill the full viewport height */
 }
