@@ -171,6 +171,7 @@
 				const reference = document.getElementById("reference").value.trim();
 				const hobbies = document.getElementById("hobbies").value.trim();
 				const whyVolunteer = document.getElementById("why").value.trim();
+				const approval = "Unapproved";
 				
 				// Get checkbox values
 				const positions = Array.from(document.querySelectorAll("input[name='volunteer-position[]']:checked"))
@@ -214,7 +215,8 @@
 							whyVolunteer,
 							positions,
 							availability,
-							days
+							days,
+							approval
 						}).then(() => {
 							alert("Account created successfully!");
 							window.location.href = "testRedirect.html";
