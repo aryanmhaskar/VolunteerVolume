@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Volunteer Clock In/Out</title>
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 1.5rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .clock-in {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .clock-in:hover {
+            background-color: #218838;
+        }
+
+        .clock-out {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .clock-out:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Volunteer Clock In/Out</h1>
+        <label for="volunteerSelect">Select Volunteer:</label>
+        <select id="volunteerSelect">
+            <option value="">-- Select Name --</option>
+            <option value="volunteer1">Jane Doe</option>
+            <option value="volunteer2">John Smith</option>
+            <!-- Add more names as needed -->
+        </select>
+
+        <div class="btn-group">
+            <button class="clock-in">Clock In</button>
+            <button class="clock-out">Clock Out</button>
+        </div>
+    </div>
+</body>
+</html>
