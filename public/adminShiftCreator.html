@@ -65,7 +65,7 @@
         <div class="form-section">
             <h2>Create Shift for Date</h2>
             <label for="createShiftDate">Select Date:</label>
-            <input type="date" id="createShiftDate" required>
+            <input type="date" id="createShiftDate" required min="">
             <button id="createShiftBtn">Create Shifts</button>
         </div>
 
@@ -112,6 +112,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        const createShiftDateInput = document.getElementById("createShiftDate");
+        const today = new Date().toISOString().split("T")[0];
+        createShiftDateInput.min = today;
+
         const volunteerSelect = document.getElementById("volunteerSelect");
         const dateSelect = document.getElementById("dateSelect");
 
@@ -130,12 +134,16 @@
 
         // Load dates with shifts
         async function loadShiftDates() {
-            const snapshot = await get(ref(db, 'Shifts'));
+        const snapshot = await get(ref(db, 'Shifts'));
             dateSelect.innerHTML = '<option value="">Select a date</option>';
             if (snapshot.exists()) {
                 const shifts = snapshot.val();
+                const today = new Date().toISOString().split("T")[0];
+
                 Object.keys(shifts).forEach(date => {
-                    dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
+                    if (date >= today) {
+                        dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
+                    }
                 });
             }
         }
