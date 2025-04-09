@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Shift Manager</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select, input[type="date"], button {
+            padding: 10px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left: Create Date Shifts -->
+        <div class="form-section">
+            <h2>Create Shift for Date</h2>
+            <label for="createShiftDate">Select Date:</label>
+            <input type="date" id="createShiftDate" required>
+            <button id="createShiftBtn">Create Shifts</button>
+        </div>
+
+        <!-- Right: Assign Volunteer -->
+        <div class="form-section">
+            <h2>Assign Volunteer</h2>
+            <label for="volunteerSelect">Volunteer Name:</label>
+            <select id="volunteerSelect"><option>Loading...</option></select>
+
+            <label for="dateSelect">Available Shift Dates:</label>
+            <select id="dateSelect"><option>Loading...</option></select>
+
+            <label for="shiftTimeSelect">Select Shift Time:</label>
+            <select id="shiftTimeSelect">
+                <option value="9:30am-1pm">9:30 AM – 1:00 PM</option>
+                <option value="1pm-5pm">1:00 PM – 5:00 PM</option>
+            </select>
+
+            <label for="roleSelect">Volunteer Role:</label>
+            <select id="roleSelect">
+                <option value="FrontDesk">Front Desk</option>
+                <option value="Gallery">Gallery</option>
+            </select>
+
+            <button id="assignBtn">Assign Volunteer</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgkYCq7PFOcarUEtjaYVrf3QcZkLlZEEk",
+            authDomain: "volunteervolume-91e20.firebaseapp.com",
+            projectId: "volunteervolume-91e20",
+            storageBucket: "volunteervolume-91e20.appspot.com",
+            messagingSenderId: "1020304409073",
+            appId: "1:1020304409073:web:81fe0ae39bc5effc130450",
+            measurementId: "G-P3JWNGQ1TE",
+            databaseURL: "https://volunteervolume-91e20-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const volunteerSelect = document.getElementById("volunteerSelect");
+        const dateSelect = document.getElementById("dateSelect");
+
+        // Load volunteers into dropdown
+        async function loadVolunteers() {
+            const snapshot = await get(ref(db, 'Volunteers'));
+            volunteerSelect.innerHTML = '<option value="">Select a volunteer</option>';
+            if (snapshot.exists()) {
+                const volunteers = snapshot.val();
+                for (const [key, data] of Object.entries(volunteers)) {
+                    const fullName = data.firstname + " " + data.lastname;
+                    volunteerSelect.innerHTML += `<option value="${key}">${fullName}</option>`;
+                }
+            }
+        }
+
+        // Load dates with shifts
+        async function loadShiftDates() {
+            const snapshot = await get(ref(db, 'Shifts'));
+            dateSelect.innerHTML = '<option value="">Select a date</option>';
+            if (snapshot.exists()) {
+                const shifts = snapshot.val();
+                Object.keys(shifts).forEach(date => {
+                    dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
+                });
+            }
+        }
+
+        loadVolunteers();
+        loadShiftDates();
+
+        // Create shift structure under selected date
+        document.getElementById("createShiftBtn").addEventListener("click", () => {
+            const date = document.getElementById("createShiftDate").value;
+            if (!date) return alert("Please select a date.");
+
+            const updates = {};
+            ["9:30am-1pm", "1pm-5pm"].forEach(time => {
+                updates[`Shifts/${date}/${time}/FrontDesk`] = "";
+                updates[`Shifts/${date}/${time}/Gallery`] = "";
+            });
+
+            update(ref(db), updates)
+                .then(() => {
+                    alert("Shifts created for date.");
+                    loadShiftDates(); // Refresh available dates
+                })
+                .catch(err => {
+                    console.error("Error creating shift:", err);
+                    alert("Error creating shift.");
+                });
+        });
+
+        // Assign volunteer to a shift
+        document.getElementById("assignBtn").addEventListener("click", () => {
+            const volunteerUID = volunteerSelect.value;
+            const date = dateSelect.value;
+            const shiftTime = document.getElementById("shiftTimeSelect").value;
+            const role = document.getElementById("roleSelect").value;
+
+            if (!volunteerUID || !date || !shiftTime || !role) {
+                alert("Please fill out all fields.");
+                return;
+            }
+
+            const path = `Shifts/${date}/${shiftTime}/${role}/${volunteerUID}`;
+            set(ref(db, path), {
+                startTime: "",
+                endTime: ""
+            }).then(() => {
+                alert("Volunteer assigned to shift.");
+            }).catch(err => {
+                console.error("Error assigning volunteer:", err);
+                alert("Failed to assign volunteer.");
+            });
+        });
+    </script>
+</body>
+</html>
