@@ -53,7 +53,13 @@ Admin dashboard (TBD)
             - Array of shift IDs
 
 Summary:
+- Fix login and redirect page to actually link back where they should go
+- Create the shift adding functionality
+- Create shift approval functionality (create shift needs to link to the page in adminShifts branch)
 - Update User, Shift, and Queue datastructures in DB
 - Register page input validation update -> correctly put into new User object
-- Fix the dashboard core functionality
+- User drashboard functionality (request shift/shift change-> view shifts)
+
+TBD Later:
 - Add a queue system for shifts
+- GMail notifications
