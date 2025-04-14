@@ -60,9 +60,13 @@
                     if (snapshot.exists()) {
                         const userData = snapshot.val();
                         if (userData.email === email && userData.firstname === firstName && userData.lastname == lastName) {
-                            alert("Login successful!");
-                            window.location.href = "testRedirect.html";
-                        } else {
+                            if (userData.approved === true) {
+                                alert("Login successful!");
+                                window.location.href = "dashboard.html";
+                            } else {
+                                alert("Your account is pending approval by an admin.");
+                            }
+                    } else {
                             alert("Incorrect credentials. Please try again.");
                         }
                     } else {
