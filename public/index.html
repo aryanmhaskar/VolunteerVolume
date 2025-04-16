@@ -60,13 +60,15 @@
                     if (snapshot.exists()) {
                         const userData = snapshot.val();
                         if (userData.email === email && userData.firstname === firstName && userData.lastname == lastName) {
-                            if (userData.approved === true) {
-                                alert("Login successful!");
-                                window.location.href = "dashboard.html";
-                            } else {
-                                alert("Your account is pending approval by an admin.");
-                            }
-                    } else {
+                            // Save user info to sessionStorage
+                            sessionStorage.setItem("volunteerUID", firstName + "_" + lastName);
+                            sessionStorage.setItem("volunteerName", firstName + " " + lastName);
+                            sessionStorage.setItem("volunteerEmail", email);
+
+                            alert("Login successful!");
+                            window.location.href = "dashboard.html";
+                        } else {
+
                             alert("Incorrect credentials. Please try again.");
                         }
                     } else {

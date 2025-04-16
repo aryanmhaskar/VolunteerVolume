@@ -69,17 +69,23 @@
 					<!-- Volunteer cards will be inserted here -->
 				</div>
 			</div>
+
+			<div class="stats">
+				<h3>Pending Shift Requests</h3>
+				<div class="requests-container" id="shiftRequests"></div>
+			  </div>			  
 		</div>
 	</div>
 
 	<!-- Use Firebase v9 modules via admin.js (which is a module) -->
 	<script type="module">
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-import {
+		import {
   getDatabase,
   ref,
   update,
   remove,
+  set,               
   onValue,
   query,
   orderByChild,
@@ -103,7 +109,69 @@ const db = getDatabase(app);
 document.addEventListener("DOMContentLoaded", () => {
   loadPendingRequests();
   setupModal();
+  loadShiftRequests();
 });
+
+function loadShiftRequests() {
+  const container = document.getElementById("shiftRequests");
+  const shiftsRef = ref(db, "ShiftRequests");
+
+  onValue(shiftsRef, (snapshot) => {
+    container.innerHTML = "";
+    if (!snapshot.exists()) return;
+
+    snapshot.forEach(dateSnap => {
+      const date = dateSnap.key;
+      dateSnap.forEach(timeSnap => {
+        const time = timeSnap.key;
+        timeSnap.forEach(roleSnap => {
+          const role = roleSnap.key;
+          roleSnap.forEach(userSnap => {
+            const uid = userSnap.key;
+            const data = userSnap.val();
+
+            const card = createShiftRequestCard(data, date, time, role, uid);
+            container.appendChild(card);
+          });
+        });
+      });
+    });
+  });
+}
+
+function createShiftRequestCard(data, date, time, role, uid) {
+  const card = document.createElement("div");
+  card.className = "request-card"; // Optional: for styling
+
+  const info = document.createElement("p");
+  info.innerHTML = `<strong>${data.name}</strong> requested<br>${date} — ${time} — ${role}`;
+  card.appendChild(info);
+
+  const approveBtn = document.createElement("button");
+  approveBtn.textContent = "Approve";
+  approveBtn.addEventListener("click", async () => {
+    const updates = {};
+    updates[`Shifts/${date}/${time}/${role}/${uid}`] = {
+      startTime: "",
+      endTime: ""
+    };
+    updates[`ShiftRequests/${date}/${time}/${role}/${uid}`] = null;
+    await update(ref(db), updates);
+    alert("Approved!");
+  });
+
+  const denyBtn = document.createElement("button");
+  denyBtn.textContent = "Deny";
+  denyBtn.addEventListener("click", async () => {
+    await set(ref(db, `ShiftRequests/${date}/${time}/${role}/${uid}`), null);
+    alert("Denied.");
+  });
+
+  card.appendChild(approveBtn);
+  card.appendChild(denyBtn);
+  return card;
+}
+
 
 function loadPendingRequests() {
     const container = document.getElementById("pendingRequests");
