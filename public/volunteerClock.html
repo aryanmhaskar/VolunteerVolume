@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Volunteer Clock In/Out</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 1.5rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .clock-in {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .clock-in:hover {
+            background-color: #218838;
+        }
+
+        .clock-out {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .clock-out:hover {
+            background-color: #c82333;
+        }
+
+        #message {
+            margin-top: 1rem;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Volunteer Clock In/Out</h1>
+        <label for="volunteerSelect">Select Volunteer:</label>
+        <select id="volunteerSelect">
+            <option value="">Loading...</option>
+        </select>
+
+        <div class="btn-group">
+            <button class="clock-in">Clock In</button>
+            <button class="clock-out">Clock Out</button>
+        </div>
+
+        <div id="message"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getDatabase, ref, get, update, child } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgkYCq7PFOcarUEtjaYVrf3QcZkLlZEEk",
+            authDomain: "volunteervolume-91e20.firebaseapp.com",
+            projectId: "volunteervolume-91e20",
+            storageBucket: "volunteervolume-91e20.appspot.com",
+            messagingSenderId: "1020304409073",
+            appId: "1:1020304409073:web:81fe0ae39bc5effc130450",
+            measurementId: "G-P3JWNGQ1TE",
+            databaseURL: "https://volunteervolume-91e20-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const select = document.getElementById("volunteerSelect");
+        const message = document.getElementById("message");
+        let currentShiftTime = null;
+        let currentDate = null;
+        let roleMap = {}; // path to display name map
+
+        function getCurrentShiftTime() {
+            const now = new Date();
+            const buffer = 20 * 60 * 1000; // 20 minutes in ms
+            const shift1Start = new Date(now.setHours(9, 10, 0, 0)); // 9:10am
+            const shift1End = new Date(now.setHours(13, 20, 0, 0)); // 1:20pm
+            const shift2Start = new Date(now.setHours(12, 40, 0, 0)); // 12:40pm
+            const shift2End = new Date(now.setHours(17, 20, 0, 0)); // 5:20pm
+            const timeNow = new Date();
+
+            if (timeNow >= shift1Start && timeNow <= shift1End) return "9:30am-1pm";
+            if (timeNow >= shift2Start && timeNow <= shift2End) return "1pm-5pm";
+            return null;
+        }
+
+        async function loadVolunteersForToday() {
+            select.innerHTML = '<option value="">Loading...</option>';
+            roleMap = {};
+
+            const today = new Date();
+            const yyyyMMdd = today.toISOString().split("T")[0];
+            currentDate = yyyyMMdd;
+            currentShiftTime = getCurrentShiftTime();
+
+            if (!currentShiftTime) {
+                message.innerText = "No active shift right now. Try during shift hours.";
+                select.innerHTML = '<option value="">No Volunteers Found</option>';
+                return;
+            }
+
+            const shiftRef = ref(db, `Shifts/${yyyyMMdd}/${currentShiftTime}`);
+            const snapshot = await get(shiftRef);
+
+            if (!snapshot.exists()) {
+                message.innerText = "No volunteers found for this shift.";
+                select.innerHTML = '<option value="">No Volunteers Found</option>';
+                return;
+            }
+
+            const shiftData = snapshot.val();
+            let found = false;
+            select.innerHTML = '<option value="">Select Volunteer</option>';
+
+            for (const role in shiftData) {
+                const roleVols = shiftData[role];
+                for (const uid in roleVols) {
+                    found = true;
+                    roleMap[uid] = { role }; // Store role path
+                    // Fetch volunteer name
+                    const userSnap = await get(ref(db, `Volunteers/${uid}`));
+                    const name = userSnap.exists() ? `${userSnap.val().firstname} ${userSnap.val().lastname}` : uid;
+                    const option = document.createElement("option");
+                    option.value = uid;
+                    option.textContent = `${name} (${role})`;
+                    select.appendChild(option);
+                }
+            }
+
+            if (!found) {
+                message.innerText = "No volunteers assigned yet for this shift.";
+                select.innerHTML = '<option value="">No Volunteers Found</option>';
+            } else {
+                message.innerText = "";
+            }
+        }
+
+        async function clockInOrOut(action) {
+            const uid = select.value;
+            if (!uid || !currentDate || !currentShiftTime || !roleMap[uid]) {
+                alert("No volunteer selected or no active shift.");
+                return;
+            }
+
+            const role = roleMap[uid].role;
+            const field = action === "in" ? "startTime" : "endTime";
+            const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const updatePath = `Shifts/${currentDate}/${currentShiftTime}/${role}/${uid}/${field}`;
+            await update(ref(db), {
+                [updatePath]: nowTime
+            });
+
+            alert(`Clock ${action === "in" ? "In" : "Out"} recorded at ${nowTime}`);
+        }
+
+        document.querySelector(".clock-in").addEventListener("click", () => clockInOrOut("in"));
+        document.querySelector(".clock-out").addEventListener("click", () => clockInOrOut("out"));
+
+        loadVolunteersForToday();
+    </script>
+</body>
+</html>
