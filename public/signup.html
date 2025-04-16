@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shift Sign-Up</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyCgkYCq7PFOcarUEtjaYVrf3QcZkLlZEEk",
+  authDomain: "volunteervolume-91e20.firebaseapp.com",
+  projectId: "volunteervolume-91e20",
+  storageBucket: "volunteervolume-91e20.appspot.com",
+  messagingSenderId: "1020304409073",
+  appId: "1:1020304409073:web:81fe0ae39bc5effc130450",
+  measurementId: "G-P3JWNGQ1TE",
+  databaseURL: "https://volunteervolume-91e20-default-rtdb.firebaseio.com/"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const uid = sessionStorage.getItem("volunteerUID");
+    const name = sessionStorage.getItem("volunteerName");
+
+    if (!uid || !name) {
+      alert("Not logged in.");
+      window.location.href = "login.html";
+    }
+
+    const dateSelect = document.getElementById("dateSelect");
+    const timeSelect = document.getElementById("shiftTimeSelect");
+    const roleSelect = document.getElementById("roleSelect");
+
+    async function loadDates() {
+  const snapshot = await get(ref(db, 'Shifts'));
+  dateSelect.innerHTML = `<option value="">Select a date</option>`;
+  if (snapshot.exists()) {
+    const today = new Date().toISOString().split("T")[0];
+
+    const dates = Object.keys(snapshot.val()).filter(date => date >= today);
+    for (const date of dates) {
+      dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
+    }
+  }
+}
+
+
+    async function fetchRole() {
+      const snap = await get(ref(db, `Volunteers/${uid}`));
+      if (snap.exists()) {
+        const data = snap.val();
+        // Optionally pre-select role or restrict based on user profile
+        roleSelect.value = data.role || "FrontDesk";
+      }
+    }
+
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      const date = dateSelect.value;
+      const time = timeSelect.value;
+      const role = roleSelect.value;
+
+      if (!date || !time || !role) {
+        return alert("Please complete all fields.");
+      }
+
+      const path = `ShiftRequests/${date}/${time}/${role}/${uid}`;
+      await set(ref(db, path), {
+        name,
+        status: "pending"
+      });
+
+      alert("Shift request submitted!");
+      window.location.href = "dashboard.html";
+    });
+
+    window.onload = () => {
+      loadDates();
+      fetchRole();
+    };
+  </script>
+</head>
+<body>
+  <h2>Shift Sign-Up</h2>
+  <label>Date:</label>
+  <select id="dateSelect"></select>
+
+  <label>Shift Time:</label>
+  <select id="shiftTimeSelect">
+    <option value="9:30am-1pm">9:30 AM - 1:00 PM</option>
+    <option value="1pm-5pm">1:00 PM - 5:00 PM</option>
+  </select>
+
+  <label>Role:</label>
+  <select id="roleSelect">
+    <option value="FrontDesk">Front Desk</option>
+    <option value="Gallery">Gallery</option>
+  </select>
+
+  <button id="submitBtn">Submit Request</button>
+</body>
+</html>
