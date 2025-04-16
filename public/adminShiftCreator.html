@@ -126,8 +126,10 @@
             if (snapshot.exists()) {
                 const volunteers = snapshot.val();
                 for (const [key, data] of Object.entries(volunteers)) {
-                    const fullName = data.firstname + " " + data.lastname;
-                    volunteerSelect.innerHTML += `<option value="${key}">${fullName}</option>`;
+                    if (data.approval === true || data.approval === "True") { // Check approval as boolean or string
+                        const fullName = data.firstname + " " + data.lastname;
+                        volunteerSelect.innerHTML += `<option value="${key}">${fullName}</option>`;
+                    }
                 }
             }
         }
