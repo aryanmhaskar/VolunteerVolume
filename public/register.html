@@ -119,7 +119,6 @@
 					<label><input type="checkbox" name="days[]" value="sunday"> Sunday</label>
 				</div>
 				
-				
 				<button id="submit" type="submit">Submit</button>
 			</form>
 		</div>
@@ -219,7 +218,8 @@
 							days
 						}).then(() => {
 							alert("Account created successfully!");
-							window.location.href = "testRedirect.html";
+							window.location.href = "index.html";
+							alert("Your application was successfully submitted! You need to be approved by an admin before logging in.");
 						}).catch((error) => {
 							console.error("Error saving data: ", error);
 							alert("Error signing up. Please try again.");
